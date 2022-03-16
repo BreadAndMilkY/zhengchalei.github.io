@@ -1,0 +1,597 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/favicon.png">
+  <link rel="icon" href="/img/favicon.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="郑查磊">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="Guava EventBus 源码解析 创建 EventBus 相关代码没啥好说的 比较简单  12345678910111213141516171819202122232425262728public class EventBus &amp;#123;    public EventBus() &amp;#123;        this(&quot;default&quot;);    &amp;#125;    p">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Guava-EventBus源码解析">
+<meta property="og:url" content="https://zhengchalei.github.io/2022/03/16/Guava-EventBus%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/index.html">
+<meta property="og:site_name" content="郑查磊的个人博客">
+<meta property="og:description" content="Guava EventBus 源码解析 创建 EventBus 相关代码没啥好说的 比较简单  12345678910111213141516171819202122232425262728public class EventBus &amp;#123;    public EventBus() &amp;#123;        this(&quot;default&quot;);    &amp;#125;    p">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://zhengchalei.github.io/img/%E7%81%AB%E6%98%9F%E4%B9%8B%E7%9C%BC.jpg">
+<meta property="article:published_time" content="2022-03-15T16:22:13.000Z">
+<meta property="article:modified_time" content="2022-03-15T16:30:15.078Z">
+<meta property="article:author" content="郑查磊">
+<meta property="article:tag" content="EventBus">
+<meta property="article:tag" content="Guava">
+<meta property="article:tag" content="Bus">
+<meta property="article:tag" content="Event">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://zhengchalei.github.io/img/%E7%81%AB%E6%98%9F%E4%B9%8B%E7%9C%BC.jpg">
+  
+  
+  <title>Guava-EventBus源码解析 - 郑查磊的个人博客</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4/github-markdown.min.css" />
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hint.css@2/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10/styles/github-gist.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.css" />
+  
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"zhengchalei.github.io","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":"3febe9df0ed325051aef878c004822e5","google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 6.0.0"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>郑查磊</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/links/">
+                <i class="iconfont icon-link-fill"></i>
+                友链
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner" id="banner" parallax=true
+         style="background: url('/img/default.png') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="Guava-EventBus源码解析">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2022-03-16 00:22" pubdate>
+        2022年3月16日 凌晨
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      28k 字
+    </span>
+  
+
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      94 分钟
+    </span>
+  
+
+  
+  
+    
+      <!-- 不蒜子统计文章PV -->
+      <span id="busuanzi_container_page_pv" style="display: none">
+        <i class="iconfont icon-eye" aria-hidden="true"></i>
+        <span id="busuanzi_value_page_pv"></span> 次
+      </span>
+    
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">Guava-EventBus源码解析</h1>
+            
+              <p class="note note-info">
+                
+                  本文最后更新于：20 小时前
+                
+              </p>
+            
+            <div class="markdown-body">
+              <h2 id="Guava-EventBus-源码解析"><a href="#Guava-EventBus-源码解析" class="headerlink" title="Guava EventBus 源码解析"></a>Guava EventBus 源码解析</h2><ol>
+<li>创建 EventBus 相关代码没啥好说的 比较简单</li>
+</ol>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">EventBus</span> &#123;<br><br>    <span class="hljs-keyword">public</span> <span class="hljs-title function_">EventBus</span><span class="hljs-params">()</span> &#123;<br>        <span class="hljs-built_in">this</span>(<span class="hljs-string">&quot;default&quot;</span>);<br>    &#125;<br><br>    <span class="hljs-keyword">public</span> <span class="hljs-title function_">EventBus</span><span class="hljs-params">(String identifier)</span> &#123;<br>        <span class="hljs-built_in">this</span>(<br>                identifier,<br>                MoreExecutors.directExecutor(),<br>                Dispatcher.perThreadDispatchQueue(),<br>                LoggingHandler.INSTANCE<br>        );<br>    &#125;<br><br>    EventBus(<br>            String identifier,<br>            Executor executor,<br>            Dispatcher dispatcher,<br>            SubscriberExceptionHandler exceptionHandler) &#123;<br>        <span class="hljs-built_in">this</span>.identifier = checkNotNull(identifier);<br>        <span class="hljs-built_in">this</span>.executor = checkNotNull(executor);<br>        <span class="hljs-built_in">this</span>.dispatcher = checkNotNull(dispatcher);<br>        <span class="hljs-built_in">this</span>.exceptionHandler = checkNotNull(exceptionHandler);<br>    &#125;<br><br><br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<ol start="2">
+<li>注册订阅 和 取消订阅</li>
+</ol>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-comment">// subscribers = </span><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">EventBus</span> &#123;<br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * 注册所有订户方法以接收 &#123;<span class="hljs-doctag">@code</span> object&#125; 事件.</span><br><span class="hljs-comment">     *</span><br><span class="hljs-comment">     * <span class="hljs-doctag">@param</span> object object whose subscriber methods should be registered.</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">register</span><span class="hljs-params">(Object object)</span> &#123;<br>        subscribers.register(object);<br>    &#125;<br><br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * 和上面类似 没啥好说的</span><br><span class="hljs-comment">     * <span class="hljs-doctag">@param</span> object 对象</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">unregister</span><span class="hljs-params">(Object object)</span> &#123;<br>        subscribers.unregister(object);<br>    &#125;<br>&#125;<br><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">SubscriberRegistry</span> &#123;<br>    <span class="hljs-keyword">void</span> <span class="hljs-title function_">register</span><span class="hljs-params">(Object listener)</span> &#123;<br>        Multimap&lt;Class&lt;?&gt;, Subscriber&gt; listenerMethods = findAllSubscribers(listener);<br><br>        <span class="hljs-keyword">for</span> (Entry&lt;Class&lt;?&gt;, Collection&lt;Subscriber&gt;&gt; entry : listenerMethods.asMap().entrySet()) &#123;<br>            Class&lt;?&gt; eventType = entry.getKey();<br>            Collection&lt;Subscriber&gt; eventMethodsInListener = entry.getValue();<br><br>            <span class="hljs-comment">// 判断, 此消息类型是否第一次注册</span><br>            CopyOnWriteArraySet&lt;Subscriber&gt; eventSubscribers = subscribers.get(eventType);<br><br>            <span class="hljs-comment">// 第一次注册, 初始化信息</span><br>            <span class="hljs-keyword">if</span> (eventSubscribers == <span class="hljs-literal">null</span>) &#123;<br>                CopyOnWriteArraySet&lt;Subscriber&gt; newSet = <span class="hljs-keyword">new</span> <span class="hljs-title class_">CopyOnWriteArraySet</span>&lt;&gt;();<br>                eventSubscribers =<br>                        MoreObjects.firstNonNull(subscribers.putIfAbsent(eventType, newSet), newSet);<br>            &#125;<br>            <span class="hljs-comment">// 添加到订阅</span><br>            eventSubscribers.addAll(eventMethodsInListener);<br>        &#125;<br>    &#125;<br><br>    <span class="hljs-keyword">private</span> Multimap&lt;Class&lt;?&gt;, Subscriber&gt; findAllSubscribers(Object listener) &#123;<br>        <span class="hljs-comment">// 创建一个 Map</span><br>        <span class="hljs-comment">// multimap不存储重复的键值对。添加与现有键值对相等的新键值对没有效果。  键和值可能为null。支持所有可选的multimap方法，并且所有返回的视图都是可修改的。</span><br>        <span class="hljs-comment">// 当任何并发操作更新multimap时，此类不是线程安全的。如果最后一次写入，并发读取操作将正常工作发生-之前任何读数。</span><br>        Multimap&lt;Class&lt;?&gt;, Subscriber&gt; methodsInListener = HashMultimap.create();<br>        <span class="hljs-comment">// 获取注册进来的Class</span><br>        Class&lt;?&gt; clazz = listener.getClass();<br>        <span class="hljs-comment">// 获取方法</span><br>        <span class="hljs-keyword">for</span> (Method method : getAnnotatedMethods(clazz)) &#123;<br>            Class&lt;?&gt;[] parameterTypes = method.getParameterTypes();<br>            <span class="hljs-comment">// 取第一个参数作为 EventBus 的入参类型匹配</span><br>            Class&lt;?&gt; eventType = parameterTypes[<span class="hljs-number">0</span>];<br>            <span class="hljs-comment">// 注册</span><br>            methodsInListener.put(eventType, Subscriber.create(bus, listener, method));<br>        &#125;<br>        <span class="hljs-keyword">return</span> methodsInListener;<br>    &#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<ol start="3">
+<li>发送消息</li>
+</ol>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">EventBus</span> &#123;<br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">post</span><span class="hljs-params">(Object event)</span> &#123;<br>        <span class="hljs-comment">//  根据消息类型, 获取注册的 Subscriber</span><br>        Iterator&lt;Subscriber&gt; eventSubscribers = subscribers.getSubscribers(event);<br>        <span class="hljs-keyword">if</span> (eventSubscribers.hasNext()) &#123;<br>            dispatcher.dispatch(event, eventSubscribers);<br>            <span class="hljs-comment">// 如果 无队列可消费, 递归等待队列</span><br>        &#125; <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (!(event <span class="hljs-keyword">instanceof</span> DeadEvent)) &#123;<br>            <span class="hljs-comment">// the event had no subscribers and was not itself a DeadEvent</span><br>            post(<span class="hljs-keyword">new</span> <span class="hljs-title class_">DeadEvent</span>(<span class="hljs-built_in">this</span>, event));<br>        &#125;<br>    &#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">Dispatcher</span> &#123;<br>    <span class="hljs-keyword">void</span> <span class="hljs-title function_">dispatch</span><span class="hljs-params">(Object event, Iterator&lt;Subscriber&gt; subscribers)</span> &#123;<br>        checkNotNull(event);<br>        checkNotNull(subscribers);<br>        <span class="hljs-comment">// 获取队列</span><br>        Queue&lt;Event&gt; queueForThread = queue.get();<br>        <span class="hljs-comment">// 将消息添加到队列中</span><br>        queueForThread.offer(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Event</span>(event, subscribers));<br><br>        <span class="hljs-keyword">if</span> (!dispatching.get()) &#123;<br>            dispatching.set(<span class="hljs-literal">true</span>);<br>            <span class="hljs-keyword">try</span> &#123;<br>                Event nextEvent;<br>                <span class="hljs-comment">// 判断有消息</span><br>                <span class="hljs-keyword">while</span> ((nextEvent = queueForThread.poll()) != <span class="hljs-literal">null</span>) &#123;<br>                    <span class="hljs-comment">// 判断有消费者</span><br>                    <span class="hljs-keyword">while</span> (nextEvent.subscribers.hasNext()) &#123;<br>                        <span class="hljs-comment">// dispatchEvent, DirectExecutor.run </span><br>                        nextEvent.subscribers.next().dispatchEvent(nextEvent.event);<br>                    &#125;<br>                &#125;<br>            &#125; <span class="hljs-keyword">finally</span> &#123;<br>                dispatching.remove();<br>                queue.remove();<br>            &#125;<br>        &#125;<br>    &#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">Subscriber</span> &#123;<br>    <span class="hljs-keyword">final</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">dispatchEvent</span><span class="hljs-params">(Object event)</span> &#123;<br>        executor.execute(<br>                <span class="hljs-comment">// Runner Lambda</span><br>                () -&gt; &#123;<br>                    <span class="hljs-keyword">try</span> &#123;<br>                        invokeSubscriberMethod(event);<br>                        <span class="hljs-comment">// 这段就是 invoke 反射, 拿到注册进来的方法, 然后调用方法, 参数就是 post 传进来的</span><br>                        <span class="hljs-comment">//  method.invoke(target, checkNotNull(event));</span><br>                    &#125; <span class="hljs-keyword">catch</span> (InvocationTargetException e) &#123;<br>                        bus.handleSubscriberException(e.getCause(), context(event));<br>                    &#125;<br>                &#125;<br>        );<br>    &#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<h2 id="看个完整版的"><a href="#看个完整版的" class="headerlink" title="看个完整版的"></a>看个完整版的</h2><p>&#x2F;&#x2F; EventBus</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br><span class="line">220</span><br><span class="line">221</span><br><span class="line">222</span><br><span class="line">223</span><br><span class="line">224</span><br><span class="line">225</span><br><span class="line">226</span><br><span class="line">227</span><br><span class="line">228</span><br><span class="line">229</span><br><span class="line">230</span><br><span class="line">231</span><br><span class="line">232</span><br><span class="line">233</span><br><span class="line">234</span><br><span class="line">235</span><br><span class="line">236</span><br><span class="line">237</span><br><span class="line">238</span><br><span class="line">239</span><br><span class="line">240</span><br><span class="line">241</span><br><span class="line">242</span><br><span class="line">243</span><br><span class="line">244</span><br><span class="line">245</span><br><span class="line">246</span><br><span class="line">247</span><br><span class="line">248</span><br><span class="line">249</span><br><span class="line">250</span><br><span class="line">251</span><br><span class="line">252</span><br><span class="line">253</span><br><span class="line">254</span><br><span class="line">255</span><br><span class="line">256</span><br><span class="line">257</span><br><span class="line">258</span><br><span class="line">259</span><br><span class="line">260</span><br><span class="line">261</span><br><span class="line">262</span><br><span class="line">263</span><br><span class="line">264</span><br><span class="line">265</span><br><span class="line">266</span><br><span class="line">267</span><br><span class="line">268</span><br><span class="line">269</span><br><span class="line">270</span><br><span class="line">271</span><br><span class="line">272</span><br><span class="line">273</span><br><span class="line">274</span><br><span class="line">275</span><br><span class="line">276</span><br><span class="line">277</span><br><span class="line">278</span><br><span class="line">279</span><br><span class="line">280</span><br><span class="line">281</span><br><span class="line">282</span><br><span class="line">283</span><br><span class="line">284</span><br><span class="line">285</span><br><span class="line">286</span><br><span class="line">287</span><br><span class="line">288</span><br><span class="line">289</span><br><span class="line">290</span><br><span class="line">291</span><br><span class="line">292</span><br><span class="line">293</span><br><span class="line">294</span><br><span class="line">295</span><br><span class="line">296</span><br><span class="line">297</span><br><span class="line">298</span><br><span class="line">299</span><br><span class="line">300</span><br><span class="line">301</span><br><span class="line">302</span><br><span class="line">303</span><br><span class="line">304</span><br><span class="line">305</span><br><span class="line">306</span><br><span class="line">307</span><br><span class="line">308</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-comment">/*</span><br><span class="hljs-comment"> * Copyright (C) 2007 The Guava Authors</span><br><span class="hljs-comment"> *</span><br><span class="hljs-comment"> * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;); you may not use this file except</span><br><span class="hljs-comment"> * in compliance with the License. You may obtain a copy of the License at</span><br><span class="hljs-comment"> *</span><br><span class="hljs-comment"> * http://www.apache.org/licenses/LICENSE-2.0</span><br><span class="hljs-comment"> *</span><br><span class="hljs-comment"> * Unless required by applicable law or agreed to in writing, software distributed under the License</span><br><span class="hljs-comment"> * is distributed on an &quot;AS IS&quot; BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express</span><br><span class="hljs-comment"> * or implied. See the License for the specific language governing permissions and limitations under</span><br><span class="hljs-comment"> * the License.</span><br><span class="hljs-comment"> */</span><br><br><span class="hljs-keyword">package</span> com.google.common.eventbus;<br><br><span class="hljs-keyword">import</span> <span class="hljs-keyword">static</span> com.google.common.base.Preconditions.checkNotNull;<br><br><span class="hljs-keyword">import</span> com.google.common.base.MoreObjects;<br><span class="hljs-keyword">import</span> com.google.common.util.concurrent.MoreExecutors;<br><span class="hljs-keyword">import</span> java.lang.reflect.Method;<br><span class="hljs-keyword">import</span> java.util.Iterator;<br><span class="hljs-keyword">import</span> java.util.Locale;<br><span class="hljs-keyword">import</span> java.util.concurrent.Executor;<br><span class="hljs-keyword">import</span> java.util.logging.Level;<br><span class="hljs-keyword">import</span> java.util.logging.Logger;<br><br><span class="hljs-comment">/**</span><br><span class="hljs-comment"> * Dispatches events to listeners, and provides ways for listeners to register themselves.</span><br><span class="hljs-comment"> *</span><br><span class="hljs-comment"> * &lt;h2&gt;Avoid EventBus&lt;/h2&gt;</span><br><span class="hljs-comment"> *</span><br><span class="hljs-comment"> * &lt;p&gt;&lt;b&gt;We recommend against using EventBus.&lt;/b&gt; It was designed many years ago, and newer</span><br><span class="hljs-comment"> * libraries offer better ways to decouple components and react to events.</span><br><span class="hljs-comment"> *</span><br><span class="hljs-comment"> * &lt;p&gt;To decouple components, we recommend a dependency-injection framework. For Android code, most</span><br><span class="hljs-comment"> * apps use &lt;a href=&quot;https://dagger.dev&quot;&gt;Dagger&lt;/a&gt;. For server code, common options include &lt;a</span><br><span class="hljs-comment"> * href=&quot;https://github.com/google/guice/wiki/Motivation&quot;&gt;Guice&lt;/a&gt; and &lt;a</span><br><span class="hljs-comment"> * href=&quot;https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-introduction&quot;&gt;Spring&lt;/a&gt;.</span><br><span class="hljs-comment"> * Frameworks typically offer a way to register multiple listeners independently and then request</span><br><span class="hljs-comment"> * them together as a set (&lt;a href=&quot;https://dagger.dev/dev-guide/multibindings&quot;&gt;Dagger&lt;/a&gt;, &lt;a</span><br><span class="hljs-comment"> * href=&quot;https://github.com/google/guice/wiki/Multibindings&quot;&gt;Guice&lt;/a&gt;, &lt;a</span><br><span class="hljs-comment"> * href=&quot;https://docs.spring.io/spring-framework/docs/current/reference/html/core.html#beans-autowired-annotation&quot;&gt;Spring&lt;/a&gt;).</span><br><span class="hljs-comment"> *</span><br><span class="hljs-comment"> * &lt;p&gt;To react to events, we recommend a reactive-streams framework like &lt;a</span><br><span class="hljs-comment"> * href=&quot;https://github.com/ReactiveX/RxJava/wiki&quot;&gt;RxJava&lt;/a&gt; (supplemented with its &lt;a</span><br><span class="hljs-comment"> * href=&quot;https://github.com/ReactiveX/RxAndroid&quot;&gt;RxAndroid&lt;/a&gt; extension if you are building for</span><br><span class="hljs-comment"> * Android) or &lt;a href=&quot;https://projectreactor.io/&quot;&gt;Project Reactor&lt;/a&gt;. (For the basics of</span><br><span class="hljs-comment"> * translating code from using an event bus to using a reactive-streams framework, see these two</span><br><span class="hljs-comment"> * guides: &lt;a href=&quot;https://blog.jkl.gg/implementing-an-event-bus-with-rxjava-rxbus/&quot;&gt;1&lt;/a&gt;, &lt;a</span><br><span class="hljs-comment"> * href=&quot;https://lorentzos.com/rxjava-as-event-bus-the-right-way-10a36bdd49ba&quot;&gt;2&lt;/a&gt;.) Some usages</span><br><span class="hljs-comment"> * of EventBus may be better written using &lt;a</span><br><span class="hljs-comment"> * href=&quot;https://kotlinlang.org/docs/coroutines-guide.html&quot;&gt;Kotlin coroutines&lt;/a&gt;, including &lt;a</span><br><span class="hljs-comment"> * href=&quot;https://kotlinlang.org/docs/flow.html&quot;&gt;Flow&lt;/a&gt; and &lt;a</span><br><span class="hljs-comment"> * href=&quot;https://kotlinlang.org/docs/channels.html&quot;&gt;Channels&lt;/a&gt;. Yet other usages are better served</span><br><span class="hljs-comment"> * by individual libraries that provide specialized support for particular use cases.</span><br><span class="hljs-comment"> *</span><br><span class="hljs-comment"> * &lt;p&gt;Disadvantages of EventBus include:</span><br><span class="hljs-comment"> *</span><br><span class="hljs-comment"> * &lt;ul&gt;</span><br><span class="hljs-comment"> *   &lt;li&gt;It makes the cross-references between producer and subscriber harder to find. This can</span><br><span class="hljs-comment"> *       complicate debugging, lead to unintentional reentrant calls, and force apps to eagerly</span><br><span class="hljs-comment"> *       initialize all possible subscribers at startup time.</span><br><span class="hljs-comment"> *   &lt;li&gt;It uses reflection in ways that break when code is processed by optimizers/minimizers like</span><br><span class="hljs-comment"> *       &lt;a href=&quot;https://developer.android.com/studio/build/shrink-code&quot;&gt;R8 and Proguard&lt;/a&gt;.</span><br><span class="hljs-comment"> *   &lt;li&gt;It doesn&#x27;t offer a way to wait for multiple events before taking action. For example, it</span><br><span class="hljs-comment"> *       doesn&#x27;t offer a way to wait for multiple producers to all report that they&#x27;re &quot;ready,&quot; nor</span><br><span class="hljs-comment"> *       does it offer a way to batch multiple events from a single producer together.</span><br><span class="hljs-comment"> *   &lt;li&gt;It doesn&#x27;t support backpressure and other features needed for resilience.</span><br><span class="hljs-comment"> *   &lt;li&gt;It doesn&#x27;t provide much control of threading.</span><br><span class="hljs-comment"> *   &lt;li&gt;It doesn&#x27;t offer much monitoring.</span><br><span class="hljs-comment"> *   &lt;li&gt;It doesn&#x27;t propagate exceptions, so apps don&#x27;t have a way to react to them.</span><br><span class="hljs-comment"> *   &lt;li&gt;It doesn&#x27;t interoperate well with RxJava, coroutines, and other more commonly used</span><br><span class="hljs-comment"> *       alternatives.</span><br><span class="hljs-comment"> *   &lt;li&gt;It imposes requirements on the lifecycle of its subscribers. For example, if an event</span><br><span class="hljs-comment"> *       occurs between when one subscriber is removed and the next subscriber is added, the event</span><br><span class="hljs-comment"> *       is dropped.</span><br><span class="hljs-comment"> *   &lt;li&gt;Its performance is suboptimal, especially under Android.</span><br><span class="hljs-comment"> *   &lt;li&gt;It &lt;a href=&quot;https://github.com/google/guava/issues/1431&quot;&gt;doesn&#x27;t support parameterized</span><br><span class="hljs-comment"> *       types&lt;/a&gt;.</span><br><span class="hljs-comment"> *   &lt;li&gt;With the introduction of lambdas in Java 8, EventBus went from less verbose than listeners</span><br><span class="hljs-comment"> *       to &lt;a href=&quot;https://github.com/google/guava/issues/3311&quot;&gt;more verbose&lt;/a&gt;.</span><br><span class="hljs-comment"> * &lt;/ul&gt;</span><br><span class="hljs-comment"> *</span><br><span class="hljs-comment"> * &lt;h2&gt;EventBus Summary&lt;/h2&gt;</span><br><span class="hljs-comment"> *</span><br><span class="hljs-comment"> * &lt;p&gt;The EventBus allows publish-subscribe-style communication between components without requiring</span><br><span class="hljs-comment"> * the components to explicitly register with one another (and thus be aware of each other). It is</span><br><span class="hljs-comment"> * designed exclusively to replace traditional Java in-process event distribution using explicit</span><br><span class="hljs-comment"> * registration. It is &lt;em&gt;not&lt;/em&gt; a general-purpose publish-subscribe system, nor is it intended</span><br><span class="hljs-comment"> * for interprocess communication.</span><br><span class="hljs-comment"> *</span><br><span class="hljs-comment"> * &lt;h2&gt;Receiving Events&lt;/h2&gt;</span><br><span class="hljs-comment"> *</span><br><span class="hljs-comment"> * &lt;p&gt;To receive events, an object should:</span><br><span class="hljs-comment"> *</span><br><span class="hljs-comment"> * &lt;ol&gt;</span><br><span class="hljs-comment"> *   &lt;li&gt;Expose a public method, known as the &lt;i&gt;event subscriber&lt;/i&gt;, which accepts a single</span><br><span class="hljs-comment"> *       argument of the type of event desired;</span><br><span class="hljs-comment"> *   &lt;li&gt;Mark it with a &#123;<span class="hljs-doctag">@link</span> Subscribe&#125; annotation;</span><br><span class="hljs-comment"> *   &lt;li&gt;Pass itself to an EventBus instance&#x27;s &#123;<span class="hljs-doctag">@link</span> #register(Object)&#125; method.</span><br><span class="hljs-comment"> * &lt;/ol&gt;</span><br><span class="hljs-comment"> *</span><br><span class="hljs-comment"> * &lt;h2&gt;Posting Events&lt;/h2&gt;</span><br><span class="hljs-comment"> *</span><br><span class="hljs-comment"> * &lt;p&gt;To post an event, simply provide the event object to the &#123;<span class="hljs-doctag">@link</span> #post(Object)&#125; method. The</span><br><span class="hljs-comment"> * EventBus instance will determine the type of event and route it to all registered listeners.</span><br><span class="hljs-comment"> *</span><br><span class="hljs-comment"> * &lt;p&gt;Events are routed based on their type &amp;mdash; an event will be delivered to any subscriber for</span><br><span class="hljs-comment"> * any type to which the event is &lt;em&gt;assignable.&lt;/em&gt; This includes implemented interfaces, all</span><br><span class="hljs-comment"> * superclasses, and all interfaces implemented by superclasses.</span><br><span class="hljs-comment"> *</span><br><span class="hljs-comment"> * &lt;p&gt;When &#123;<span class="hljs-doctag">@code</span> post&#125; is called, all registered subscribers for an event are run in sequence, so</span><br><span class="hljs-comment"> * subscribers should be reasonably quick. If an event may trigger an extended process (such as a</span><br><span class="hljs-comment"> * database load), spawn a thread or queue it for later. (For a convenient way to do this, use an</span><br><span class="hljs-comment"> * &#123;<span class="hljs-doctag">@link</span> AsyncEventBus&#125;.)</span><br><span class="hljs-comment"> *</span><br><span class="hljs-comment"> * &lt;h2&gt;Subscriber Methods&lt;/h2&gt;</span><br><span class="hljs-comment"> *</span><br><span class="hljs-comment"> * &lt;p&gt;Event subscriber methods must accept only one argument: the event.</span><br><span class="hljs-comment"> *</span><br><span class="hljs-comment"> * &lt;p&gt;Subscribers should not, in general, throw. If they do, the EventBus will catch and log the</span><br><span class="hljs-comment"> * exception. This is rarely the right solution for error handling and should not be relied upon; it</span><br><span class="hljs-comment"> * is intended solely to help find problems during development.</span><br><span class="hljs-comment"> *</span><br><span class="hljs-comment"> * &lt;p&gt;The EventBus guarantees that it will not call a subscriber method from multiple threads</span><br><span class="hljs-comment"> * simultaneously, unless the method explicitly allows it by bearing the &#123;<span class="hljs-doctag">@link</span></span><br><span class="hljs-comment"> * AllowConcurrentEvents&#125; annotation. If this annotation is not present, subscriber methods need not</span><br><span class="hljs-comment"> * worry about being reentrant, unless also called from outside the EventBus.</span><br><span class="hljs-comment"> *</span><br><span class="hljs-comment"> * &lt;h2&gt;Dead Events&lt;/h2&gt;</span><br><span class="hljs-comment"> *</span><br><span class="hljs-comment"> * &lt;p&gt;If an event is posted, but no registered subscribers can accept it, it is considered &quot;dead.&quot;</span><br><span class="hljs-comment"> * To give the system a second chance to handle dead events, they are wrapped in an instance of</span><br><span class="hljs-comment"> * &#123;<span class="hljs-doctag">@link</span> DeadEvent&#125; and reposted.</span><br><span class="hljs-comment"> *</span><br><span class="hljs-comment"> * &lt;p&gt;If a subscriber for a supertype of all events (such as Object) is registered, no event will</span><br><span class="hljs-comment"> * ever be considered dead, and no DeadEvents will be generated. Accordingly, while DeadEvent</span><br><span class="hljs-comment"> * extends &#123;<span class="hljs-doctag">@link</span> Object&#125;, a subscriber registered to receive any Object will never receive a</span><br><span class="hljs-comment"> * DeadEvent.</span><br><span class="hljs-comment"> *</span><br><span class="hljs-comment"> * &lt;p&gt;This class is safe for concurrent use.</span><br><span class="hljs-comment"> *</span><br><span class="hljs-comment"> * &lt;p&gt;See the Guava User Guide article on &lt;a</span><br><span class="hljs-comment"> * href=&quot;https://github.com/google/guava/wiki/EventBusExplained&quot;&gt;&#123;<span class="hljs-doctag">@code</span> EventBus&#125;&lt;/a&gt;.</span><br><span class="hljs-comment"> *</span><br><span class="hljs-comment"> * <span class="hljs-doctag">@author</span> Cliff Biffle</span><br><span class="hljs-comment"> * <span class="hljs-doctag">@since</span> 10.0</span><br><span class="hljs-comment"> */</span><br><span class="hljs-meta">@ElementTypesAreNonnullByDefault</span><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">EventBus</span> &#123;<br><br>  <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-type">Logger</span> <span class="hljs-variable">logger</span> <span class="hljs-operator">=</span> Logger.getLogger(EventBus.class.getName());<br><br>  <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> String identifier;<br>  <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> Executor executor;<br>  <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> SubscriberExceptionHandler exceptionHandler;<br><br>  <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> <span class="hljs-type">SubscriberRegistry</span> <span class="hljs-variable">subscribers</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">SubscriberRegistry</span>(<span class="hljs-built_in">this</span>);<br>  <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> Dispatcher dispatcher;<br><br>  <span class="hljs-comment">/** Creates a new EventBus named &quot;default&quot;. */</span><br>  <span class="hljs-keyword">public</span> <span class="hljs-title function_">EventBus</span><span class="hljs-params">()</span> &#123;<br>    <span class="hljs-built_in">this</span>(<span class="hljs-string">&quot;default&quot;</span>);<br>  &#125;<br><br>  <span class="hljs-comment">/**</span><br><span class="hljs-comment">   * Creates a new EventBus with the given &#123;<span class="hljs-doctag">@code</span> identifier&#125;.</span><br><span class="hljs-comment">   *</span><br><span class="hljs-comment">   * <span class="hljs-doctag">@param</span> identifier a brief name for this bus, for logging purposes. Should be a valid Java</span><br><span class="hljs-comment">   *     identifier.</span><br><span class="hljs-comment">   */</span><br>  <span class="hljs-keyword">public</span> <span class="hljs-title function_">EventBus</span><span class="hljs-params">(String identifier)</span> &#123;<br>    <span class="hljs-built_in">this</span>(<br>        identifier,<br>        MoreExecutors.directExecutor(),<br>        Dispatcher.perThreadDispatchQueue(),<br>        LoggingHandler.INSTANCE);<br>  &#125;<br><br>  <span class="hljs-comment">/**</span><br><span class="hljs-comment">   * Creates a new EventBus with the given &#123;<span class="hljs-doctag">@link</span> SubscriberExceptionHandler&#125;.</span><br><span class="hljs-comment">   *</span><br><span class="hljs-comment">   * <span class="hljs-doctag">@param</span> exceptionHandler Handler for subscriber exceptions.</span><br><span class="hljs-comment">   * <span class="hljs-doctag">@since</span> 16.0</span><br><span class="hljs-comment">   */</span><br>  <span class="hljs-keyword">public</span> <span class="hljs-title function_">EventBus</span><span class="hljs-params">(SubscriberExceptionHandler exceptionHandler)</span> &#123;<br>    <span class="hljs-built_in">this</span>(<br>        <span class="hljs-string">&quot;default&quot;</span>,<br>        MoreExecutors.directExecutor(),<br>        Dispatcher.perThreadDispatchQueue(),<br>        exceptionHandler);<br>  &#125;<br><br>  EventBus(<br>      String identifier,<br>      Executor executor,<br>      Dispatcher dispatcher,<br>      SubscriberExceptionHandler exceptionHandler) &#123;<br>    <span class="hljs-built_in">this</span>.identifier = checkNotNull(identifier);<br>    <span class="hljs-built_in">this</span>.executor = checkNotNull(executor);<br>    <span class="hljs-built_in">this</span>.dispatcher = checkNotNull(dispatcher);<br>    <span class="hljs-built_in">this</span>.exceptionHandler = checkNotNull(exceptionHandler);<br>  &#125;<br><br>  <span class="hljs-comment">/**</span><br><span class="hljs-comment">   * Returns the identifier for this event bus.</span><br><span class="hljs-comment">   *</span><br><span class="hljs-comment">   * <span class="hljs-doctag">@since</span> 19.0</span><br><span class="hljs-comment">   */</span><br>  <span class="hljs-keyword">public</span> <span class="hljs-keyword">final</span> String <span class="hljs-title function_">identifier</span><span class="hljs-params">()</span> &#123;<br>    <span class="hljs-keyword">return</span> identifier;<br>  &#125;<br><br>  <span class="hljs-comment">/** Returns the default executor this event bus uses for dispatching events to subscribers. */</span><br>  <span class="hljs-keyword">final</span> Executor <span class="hljs-title function_">executor</span><span class="hljs-params">()</span> &#123;<br>    <span class="hljs-keyword">return</span> executor;<br>  &#125;<br><br>  <span class="hljs-comment">/** Handles the given exception thrown by a subscriber with the given context. */</span><br>  <span class="hljs-keyword">void</span> <span class="hljs-title function_">handleSubscriberException</span><span class="hljs-params">(Throwable e, SubscriberExceptionContext context)</span> &#123;<br>    checkNotNull(e);<br>    checkNotNull(context);<br>    <span class="hljs-keyword">try</span> &#123;<br>      exceptionHandler.handleException(e, context);<br>    &#125; <span class="hljs-keyword">catch</span> (Throwable e2) &#123;<br>      <span class="hljs-comment">// if the handler threw an exception... well, just log it</span><br>      logger.log(<br>          Level.SEVERE,<br>          String.format(Locale.ROOT, <span class="hljs-string">&quot;Exception %s thrown while handling exception: %s&quot;</span>, e2, e),<br>          e2);<br>    &#125;<br>  &#125;<br><br>  <span class="hljs-comment">/**</span><br><span class="hljs-comment">   * Registers all subscriber methods on &#123;<span class="hljs-doctag">@code</span> object&#125; to receive events.</span><br><span class="hljs-comment">   *</span><br><span class="hljs-comment">   * <span class="hljs-doctag">@param</span> object object whose subscriber methods should be registered.</span><br><span class="hljs-comment">   */</span><br>  <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">register</span><span class="hljs-params">(Object object)</span> &#123;<br>    subscribers.register(object);<br>  &#125;<br><br>  <span class="hljs-comment">/**</span><br><span class="hljs-comment">   * Unregisters all subscriber methods on a registered &#123;<span class="hljs-doctag">@code</span> object&#125;.</span><br><span class="hljs-comment">   *</span><br><span class="hljs-comment">   * <span class="hljs-doctag">@param</span> object object whose subscriber methods should be unregistered.</span><br><span class="hljs-comment">   * <span class="hljs-doctag">@throws</span> IllegalArgumentException if the object was not previously registered.</span><br><span class="hljs-comment">   */</span><br>  <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">unregister</span><span class="hljs-params">(Object object)</span> &#123;<br>    subscribers.unregister(object);<br>  &#125;<br><br>  <span class="hljs-comment">/**</span><br><span class="hljs-comment">   * Posts an event to all registered subscribers. This method will return successfully after the</span><br><span class="hljs-comment">   * event has been posted to all subscribers, and regardless of any exceptions thrown by</span><br><span class="hljs-comment">   * subscribers.</span><br><span class="hljs-comment">   *</span><br><span class="hljs-comment">   * &lt;p&gt;If no subscribers have been subscribed for &#123;<span class="hljs-doctag">@code</span> event&#125;&#x27;s class, and &#123;<span class="hljs-doctag">@code</span> event&#125; is not</span><br><span class="hljs-comment">   * already a &#123;<span class="hljs-doctag">@link</span> DeadEvent&#125;, it will be wrapped in a DeadEvent and reposted.</span><br><span class="hljs-comment">   *</span><br><span class="hljs-comment">   * <span class="hljs-doctag">@param</span> event event to post.</span><br><span class="hljs-comment">   */</span><br>  <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">post</span><span class="hljs-params">(Object event)</span> &#123;<br>    Iterator&lt;Subscriber&gt; eventSubscribers = subscribers.getSubscribers(event);<br>    <span class="hljs-keyword">if</span> (eventSubscribers.hasNext()) &#123;<br>      dispatcher.dispatch(event, eventSubscribers);<br>    &#125; <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (!(event <span class="hljs-keyword">instanceof</span> DeadEvent)) &#123;<br>      <span class="hljs-comment">// the event had no subscribers and was not itself a DeadEvent</span><br>      post(<span class="hljs-keyword">new</span> <span class="hljs-title class_">DeadEvent</span>(<span class="hljs-built_in">this</span>, event));<br>    &#125;<br>  &#125;<br><br>  <span class="hljs-meta">@Override</span><br>  <span class="hljs-keyword">public</span> String <span class="hljs-title function_">toString</span><span class="hljs-params">()</span> &#123;<br>    <span class="hljs-keyword">return</span> MoreObjects.toStringHelper(<span class="hljs-built_in">this</span>).addValue(identifier).toString();<br>  &#125;<br><br>  <span class="hljs-comment">/** Simple logging handler for subscriber exceptions. */</span><br>  <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">LoggingHandler</span> <span class="hljs-keyword">implements</span> <span class="hljs-title class_">SubscriberExceptionHandler</span> &#123;<br>    <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-type">LoggingHandler</span> <span class="hljs-variable">INSTANCE</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">LoggingHandler</span>();<br><br>    <span class="hljs-meta">@Override</span><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">handleException</span><span class="hljs-params">(Throwable exception, SubscriberExceptionContext context)</span> &#123;<br>      <span class="hljs-type">Logger</span> <span class="hljs-variable">logger</span> <span class="hljs-operator">=</span> logger(context);<br>      <span class="hljs-keyword">if</span> (logger.isLoggable(Level.SEVERE)) &#123;<br>        logger.log(Level.SEVERE, message(context), exception);<br>      &#125;<br>    &#125;<br><br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> Logger <span class="hljs-title function_">logger</span><span class="hljs-params">(SubscriberExceptionContext context)</span> &#123;<br>      <span class="hljs-keyword">return</span> Logger.getLogger(EventBus.class.getName() + <span class="hljs-string">&quot;.&quot;</span> + context.getEventBus().identifier());<br>    &#125;<br><br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> String <span class="hljs-title function_">message</span><span class="hljs-params">(SubscriberExceptionContext context)</span> &#123;<br>      <span class="hljs-type">Method</span> <span class="hljs-variable">method</span> <span class="hljs-operator">=</span> context.getSubscriberMethod();<br>      <span class="hljs-keyword">return</span> <span class="hljs-string">&quot;Exception thrown by subscriber method &quot;</span><br>          + method.getName()<br>          + <span class="hljs-string">&#x27;(&#x27;</span><br>          + method.getParameterTypes()[<span class="hljs-number">0</span>].getName()<br>          + <span class="hljs-string">&#x27;)&#x27;</span><br>          + <span class="hljs-string">&quot; on subscriber &quot;</span><br>          + context.getSubscriber()<br>          + <span class="hljs-string">&quot; when dispatching event: &quot;</span><br>          + context.getEvent();<br>    &#125;<br>  &#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<p>&#x2F;&#x2F; Subscriber</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-comment">/*</span><br><span class="hljs-comment"> * Copyright (C) 2014 The Guava Authors</span><br><span class="hljs-comment"> *</span><br><span class="hljs-comment"> * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;); you may not use this file except</span><br><span class="hljs-comment"> * in compliance with the License. You may obtain a copy of the License at</span><br><span class="hljs-comment"> *</span><br><span class="hljs-comment"> * http://www.apache.org/licenses/LICENSE-2.0</span><br><span class="hljs-comment"> *</span><br><span class="hljs-comment"> * Unless required by applicable law or agreed to in writing, software distributed under the License</span><br><span class="hljs-comment"> * is distributed on an &quot;AS IS&quot; BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express</span><br><span class="hljs-comment"> * or implied. See the License for the specific language governing permissions and limitations under</span><br><span class="hljs-comment"> * the License.</span><br><span class="hljs-comment"> */</span><br><br><span class="hljs-keyword">package</span> com.google.common.eventbus;<br><br><span class="hljs-keyword">import</span> <span class="hljs-keyword">static</span> com.google.common.base.Preconditions.checkNotNull;<br><br><span class="hljs-keyword">import</span> com.google.common.annotations.VisibleForTesting;<br><span class="hljs-keyword">import</span> com.google.j2objc.annotations.Weak;<br><span class="hljs-keyword">import</span> java.lang.reflect.InvocationTargetException;<br><span class="hljs-keyword">import</span> java.lang.reflect.Method;<br><span class="hljs-keyword">import</span> java.util.concurrent.Executor;<br><span class="hljs-keyword">import</span> javax.annotation.CheckForNull;<br><br><span class="hljs-comment">/**</span><br><span class="hljs-comment"> * A subscriber method on a specific object, plus the executor that should be used for dispatching</span><br><span class="hljs-comment"> * events to it.</span><br><span class="hljs-comment"> *</span><br><span class="hljs-comment"> * &lt;p&gt;Two subscribers are equivalent when they refer to the same method on the same object (not</span><br><span class="hljs-comment"> * class). This property is used to ensure that no subscriber method is registered more than once.</span><br><span class="hljs-comment"> *</span><br><span class="hljs-comment"> * <span class="hljs-doctag">@author</span> Colin Decker</span><br><span class="hljs-comment"> */</span><br><span class="hljs-meta">@ElementTypesAreNonnullByDefault</span><br><span class="hljs-keyword">class</span> <span class="hljs-title class_">Subscriber</span> &#123;<br><br>  <span class="hljs-comment">/** Creates a &#123;<span class="hljs-doctag">@code</span> Subscriber&#125; for &#123;<span class="hljs-doctag">@code</span> method&#125; on &#123;<span class="hljs-doctag">@code</span> listener&#125;. */</span><br>  <span class="hljs-keyword">static</span> Subscriber <span class="hljs-title function_">create</span><span class="hljs-params">(EventBus bus, Object listener, Method method)</span> &#123;<br>    <span class="hljs-keyword">return</span> isDeclaredThreadSafe(method)<br>        ? <span class="hljs-keyword">new</span> <span class="hljs-title class_">Subscriber</span>(bus, listener, method)<br>        : <span class="hljs-keyword">new</span> <span class="hljs-title class_">SynchronizedSubscriber</span>(bus, listener, method);<br>  &#125;<br><br>  <span class="hljs-comment">/** The event bus this subscriber belongs to. */</span><br>  <span class="hljs-meta">@Weak</span> <span class="hljs-keyword">private</span> EventBus bus;<br><br>  <span class="hljs-comment">/** The object with the subscriber method. */</span><br>  <span class="hljs-meta">@VisibleForTesting</span> <span class="hljs-keyword">final</span> Object target;<br><br>  <span class="hljs-comment">/** Subscriber method. */</span><br>  <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> Method method;<br><br>  <span class="hljs-comment">/** Executor to use for dispatching events to this subscriber. */</span><br>  <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> Executor executor;<br><br>  <span class="hljs-keyword">private</span> <span class="hljs-title function_">Subscriber</span><span class="hljs-params">(EventBus bus, Object target, Method method)</span> &#123;<br>    <span class="hljs-built_in">this</span>.bus = bus;<br>    <span class="hljs-built_in">this</span>.target = checkNotNull(target);<br>    <span class="hljs-built_in">this</span>.method = method;<br>    method.setAccessible(<span class="hljs-literal">true</span>);<br><br>    <span class="hljs-built_in">this</span>.executor = bus.executor();<br>  &#125;<br><br>  <span class="hljs-comment">/** Dispatches &#123;<span class="hljs-doctag">@code</span> event&#125; to this subscriber using the proper executor. */</span><br>  <span class="hljs-keyword">final</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">dispatchEvent</span><span class="hljs-params">(Object event)</span> &#123;<br>    executor.execute(<br>        () -&gt; &#123;<br>          <span class="hljs-keyword">try</span> &#123;<br>            invokeSubscriberMethod(event);<br>          &#125; <span class="hljs-keyword">catch</span> (InvocationTargetException e) &#123;<br>            bus.handleSubscriberException(e.getCause(), context(event));<br>          &#125;<br>        &#125;);<br>  &#125;<br><br>  <span class="hljs-comment">/**</span><br><span class="hljs-comment">   * Invokes the subscriber method. This method can be overridden to make the invocation</span><br><span class="hljs-comment">   * synchronized.</span><br><span class="hljs-comment">   */</span><br>  <span class="hljs-meta">@VisibleForTesting</span><br>  <span class="hljs-keyword">void</span> <span class="hljs-title function_">invokeSubscriberMethod</span><span class="hljs-params">(Object event)</span> <span class="hljs-keyword">throws</span> InvocationTargetException &#123;<br>    <span class="hljs-keyword">try</span> &#123;<br>      method.invoke(target, checkNotNull(event));<br>    &#125; <span class="hljs-keyword">catch</span> (IllegalArgumentException e) &#123;<br>      <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Error</span>(<span class="hljs-string">&quot;Method rejected target/argument: &quot;</span> + event, e);<br>    &#125; <span class="hljs-keyword">catch</span> (IllegalAccessException e) &#123;<br>      <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Error</span>(<span class="hljs-string">&quot;Method became inaccessible: &quot;</span> + event, e);<br>    &#125; <span class="hljs-keyword">catch</span> (InvocationTargetException e) &#123;<br>      <span class="hljs-keyword">if</span> (e.getCause() <span class="hljs-keyword">instanceof</span> Error) &#123;<br>        <span class="hljs-keyword">throw</span> (Error) e.getCause();<br>      &#125;<br>      <span class="hljs-keyword">throw</span> e;<br>    &#125;<br>  &#125;<br><br>  <span class="hljs-comment">/** Gets the context for the given event. */</span><br>  <span class="hljs-keyword">private</span> SubscriberExceptionContext <span class="hljs-title function_">context</span><span class="hljs-params">(Object event)</span> &#123;<br>    <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">SubscriberExceptionContext</span>(bus, event, target, method);<br>  &#125;<br><br>  <span class="hljs-meta">@Override</span><br>  <span class="hljs-keyword">public</span> <span class="hljs-keyword">final</span> <span class="hljs-type">int</span> <span class="hljs-title function_">hashCode</span><span class="hljs-params">()</span> &#123;<br>    <span class="hljs-keyword">return</span> (<span class="hljs-number">31</span> + method.hashCode()) * <span class="hljs-number">31</span> + System.identityHashCode(target);<br>  &#125;<br><br>  <span class="hljs-meta">@Override</span><br>  <span class="hljs-keyword">public</span> <span class="hljs-keyword">final</span> <span class="hljs-type">boolean</span> <span class="hljs-title function_">equals</span><span class="hljs-params">(<span class="hljs-meta">@CheckForNull</span> Object obj)</span> &#123;<br>    <span class="hljs-keyword">if</span> (obj <span class="hljs-keyword">instanceof</span> Subscriber) &#123;<br>      <span class="hljs-type">Subscriber</span> <span class="hljs-variable">that</span> <span class="hljs-operator">=</span> (Subscriber) obj;<br>      <span class="hljs-comment">// Use == so that different equal instances will still receive events.</span><br>      <span class="hljs-comment">// We only guard against the case that the same object is registered</span><br>      <span class="hljs-comment">// multiple times</span><br>      <span class="hljs-type">return</span> <span class="hljs-variable">target</span> <span class="hljs-operator">=</span>= that.target &amp;&amp; method.equals(that.method);<br>    &#125;<br>    <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;<br>  &#125;<br><br>  <span class="hljs-comment">/**</span><br><span class="hljs-comment">   * Checks whether &#123;<span class="hljs-doctag">@code</span> method&#125; is thread-safe, as indicated by the presence of the &#123;<span class="hljs-doctag">@link</span></span><br><span class="hljs-comment">   * AllowConcurrentEvents&#125; annotation.</span><br><span class="hljs-comment">   */</span><br>  <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-type">boolean</span> <span class="hljs-title function_">isDeclaredThreadSafe</span><span class="hljs-params">(Method method)</span> &#123;<br>    <span class="hljs-keyword">return</span> method.getAnnotation(AllowConcurrentEvents.class) != <span class="hljs-literal">null</span>;<br>  &#125;<br><br>  <span class="hljs-comment">/**</span><br><span class="hljs-comment">   * Subscriber that synchronizes invocations of a method to ensure that only one thread may enter</span><br><span class="hljs-comment">   * the method at a time.</span><br><span class="hljs-comment">   */</span><br>  <span class="hljs-meta">@VisibleForTesting</span><br>  <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">SynchronizedSubscriber</span> <span class="hljs-keyword">extends</span> <span class="hljs-title class_">Subscriber</span> &#123;<br><br>    <span class="hljs-keyword">private</span> <span class="hljs-title function_">SynchronizedSubscriber</span><span class="hljs-params">(EventBus bus, Object target, Method method)</span> &#123;<br>      <span class="hljs-built_in">super</span>(bus, target, method);<br>    &#125;<br><br>    <span class="hljs-meta">@Override</span><br>    <span class="hljs-keyword">void</span> <span class="hljs-title function_">invokeSubscriberMethod</span><span class="hljs-params">(Object event)</span> <span class="hljs-keyword">throws</span> InvocationTargetException &#123;<br>      <span class="hljs-keyword">synchronized</span> (<span class="hljs-built_in">this</span>) &#123;<br>        <span class="hljs-built_in">super</span>.invokeSubscriberMethod(event);<br>      &#125;<br>    &#125;<br>  &#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<p>&#x2F;&#x2F; Dispatcher</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-comment">/*</span><br><span class="hljs-comment"> * Copyright (C) 2014 The Guava Authors</span><br><span class="hljs-comment"> *</span><br><span class="hljs-comment"> * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;); you may not use this file except</span><br><span class="hljs-comment"> * in compliance with the License. You may obtain a copy of the License at</span><br><span class="hljs-comment"> *</span><br><span class="hljs-comment"> * http://www.apache.org/licenses/LICENSE-2.0</span><br><span class="hljs-comment"> *</span><br><span class="hljs-comment"> * Unless required by applicable law or agreed to in writing, software distributed under the License</span><br><span class="hljs-comment"> * is distributed on an &quot;AS IS&quot; BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express</span><br><span class="hljs-comment"> * or implied. See the License for the specific language governing permissions and limitations under</span><br><span class="hljs-comment"> * the License.</span><br><span class="hljs-comment"> */</span><br><br><span class="hljs-keyword">package</span> com.google.common.eventbus;<br><br><span class="hljs-keyword">import</span> <span class="hljs-keyword">static</span> com.google.common.base.Preconditions.checkNotNull;<br><br><span class="hljs-keyword">import</span> com.google.common.collect.Queues;<br><span class="hljs-keyword">import</span> java.util.Iterator;<br><span class="hljs-keyword">import</span> java.util.Queue;<br><span class="hljs-keyword">import</span> java.util.concurrent.ConcurrentLinkedQueue;<br><br><span class="hljs-comment">/**</span><br><span class="hljs-comment"> * Handler for dispatching events to subscribers, providing different event ordering guarantees that</span><br><span class="hljs-comment"> * make sense for different situations.</span><br><span class="hljs-comment"> *</span><br><span class="hljs-comment"> * &lt;p&gt;&lt;b&gt;Note:&lt;/b&gt; The dispatcher is orthogonal to the subscriber&#x27;s &#123;<span class="hljs-doctag">@code</span> Executor&#125;. The dispatcher</span><br><span class="hljs-comment"> * controls the order in which events are dispatched, while the executor controls how (i.e. on which</span><br><span class="hljs-comment"> * thread) the subscriber is actually called when an event is dispatched to it.</span><br><span class="hljs-comment"> *</span><br><span class="hljs-comment"> * <span class="hljs-doctag">@author</span> Colin Decker</span><br><span class="hljs-comment"> */</span><br><span class="hljs-meta">@ElementTypesAreNonnullByDefault</span><br><span class="hljs-keyword">abstract</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">Dispatcher</span> &#123;<br><br>  <span class="hljs-comment">/**</span><br><span class="hljs-comment">   * Returns a dispatcher that queues events that are posted reentrantly on a thread that is already</span><br><span class="hljs-comment">   * dispatching an event, guaranteeing that all events posted on a single thread are dispatched to</span><br><span class="hljs-comment">   * all subscribers in the order they are posted.</span><br><span class="hljs-comment">   *</span><br><span class="hljs-comment">   * &lt;p&gt;When all subscribers are dispatched to using a &lt;i&gt;direct&lt;/i&gt; executor (which dispatches on</span><br><span class="hljs-comment">   * the same thread that posts the event), this yields a breadth-first dispatch order on each</span><br><span class="hljs-comment">   * thread. That is, all subscribers to a single event A will be called before any subscribers to</span><br><span class="hljs-comment">   * any events B and C that are posted to the event bus by the subscribers to A.</span><br><span class="hljs-comment">   */</span><br>  <span class="hljs-keyword">static</span> Dispatcher <span class="hljs-title function_">perThreadDispatchQueue</span><span class="hljs-params">()</span> &#123;<br>    <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">PerThreadQueuedDispatcher</span>();<br>  &#125;<br><br>  <span class="hljs-comment">/**</span><br><span class="hljs-comment">   * Returns a dispatcher that queues events that are posted in a single global queue. This behavior</span><br><span class="hljs-comment">   * matches the original behavior of AsyncEventBus exactly, but is otherwise not especially useful.</span><br><span class="hljs-comment">   * For async dispatch, an &#123;<span class="hljs-doctag">@linkplain</span> #immediate() immediate&#125; dispatcher should generally be</span><br><span class="hljs-comment">   * preferable.</span><br><span class="hljs-comment">   */</span><br>  <span class="hljs-keyword">static</span> Dispatcher <span class="hljs-title function_">legacyAsync</span><span class="hljs-params">()</span> &#123;<br>    <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">LegacyAsyncDispatcher</span>();<br>  &#125;<br><br>  <span class="hljs-comment">/**</span><br><span class="hljs-comment">   * Returns a dispatcher that dispatches events to subscribers immediately as they&#x27;re posted</span><br><span class="hljs-comment">   * without using an intermediate queue to change the dispatch order. This is effectively a</span><br><span class="hljs-comment">   * depth-first dispatch order, vs. breadth-first when using a queue.</span><br><span class="hljs-comment">   */</span><br>  <span class="hljs-keyword">static</span> Dispatcher <span class="hljs-title function_">immediate</span><span class="hljs-params">()</span> &#123;<br>    <span class="hljs-keyword">return</span> ImmediateDispatcher.INSTANCE;<br>  &#125;<br><br>  <span class="hljs-comment">/** Dispatches the given &#123;<span class="hljs-doctag">@code</span> event&#125; to the given &#123;<span class="hljs-doctag">@code</span> subscribers&#125;. */</span><br>  <span class="hljs-keyword">abstract</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">dispatch</span><span class="hljs-params">(Object event, Iterator&lt;Subscriber&gt; subscribers)</span>;<br><br>  <span class="hljs-comment">/** Implementation of a &#123;<span class="hljs-doctag">@link</span> #perThreadDispatchQueue()&#125; dispatcher. */</span><br>  <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">PerThreadQueuedDispatcher</span> <span class="hljs-keyword">extends</span> <span class="hljs-title class_">Dispatcher</span> &#123;<br><br>    <span class="hljs-comment">// This dispatcher matches the original dispatch behavior of EventBus.</span><br><br>    <span class="hljs-comment">/** Per-thread queue of events to dispatch. */</span><br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> ThreadLocal&lt;Queue&lt;Event&gt;&gt; queue =<br>        <span class="hljs-keyword">new</span> <span class="hljs-title class_">ThreadLocal</span>&lt;Queue&lt;Event&gt;&gt;() &#123;<br>          <span class="hljs-meta">@Override</span><br>          <span class="hljs-keyword">protected</span> Queue&lt;Event&gt; <span class="hljs-title function_">initialValue</span><span class="hljs-params">()</span> &#123;<br>            <span class="hljs-keyword">return</span> Queues.newArrayDeque();<br>          &#125;<br>        &#125;;<br><br>    <span class="hljs-comment">/** Per-thread dispatch state, used to avoid reentrant event dispatching. */</span><br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> ThreadLocal&lt;Boolean&gt; dispatching =<br>        <span class="hljs-keyword">new</span> <span class="hljs-title class_">ThreadLocal</span>&lt;Boolean&gt;() &#123;<br>          <span class="hljs-meta">@Override</span><br>          <span class="hljs-keyword">protected</span> Boolean <span class="hljs-title function_">initialValue</span><span class="hljs-params">()</span> &#123;<br>            <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;<br>          &#125;<br>        &#125;;<br><br>    <span class="hljs-meta">@Override</span><br>    <span class="hljs-keyword">void</span> <span class="hljs-title function_">dispatch</span><span class="hljs-params">(Object event, Iterator&lt;Subscriber&gt; subscribers)</span> &#123;<br>      checkNotNull(event);<br>      checkNotNull(subscribers);<br>      Queue&lt;Event&gt; queueForThread = queue.get();<br>      queueForThread.offer(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Event</span>(event, subscribers));<br><br>      <span class="hljs-keyword">if</span> (!dispatching.get()) &#123;<br>        dispatching.set(<span class="hljs-literal">true</span>);<br>        <span class="hljs-keyword">try</span> &#123;<br>          Event nextEvent;<br>          <span class="hljs-keyword">while</span> ((nextEvent = queueForThread.poll()) != <span class="hljs-literal">null</span>) &#123;<br>            <span class="hljs-keyword">while</span> (nextEvent.subscribers.hasNext()) &#123;<br>              nextEvent.subscribers.next().dispatchEvent(nextEvent.event);<br>            &#125;<br>          &#125;<br>        &#125; <span class="hljs-keyword">finally</span> &#123;<br>          dispatching.remove();<br>          queue.remove();<br>        &#125;<br>      &#125;<br>    &#125;<br><br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">Event</span> &#123;<br>      <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> Object event;<br>      <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> Iterator&lt;Subscriber&gt; subscribers;<br><br>      <span class="hljs-keyword">private</span> <span class="hljs-title function_">Event</span><span class="hljs-params">(Object event, Iterator&lt;Subscriber&gt; subscribers)</span> &#123;<br>        <span class="hljs-built_in">this</span>.event = event;<br>        <span class="hljs-built_in">this</span>.subscribers = subscribers;<br>      &#125;<br>    &#125;<br>  &#125;<br><br>  <span class="hljs-comment">/** Implementation of a &#123;<span class="hljs-doctag">@link</span> #legacyAsync()&#125; dispatcher. */</span><br>  <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">LegacyAsyncDispatcher</span> <span class="hljs-keyword">extends</span> <span class="hljs-title class_">Dispatcher</span> &#123;<br><br>    <span class="hljs-comment">// This dispatcher matches the original dispatch behavior of AsyncEventBus.</span><br>    <span class="hljs-comment">//</span><br>    <span class="hljs-comment">// We can&#x27;t really make any guarantees about the overall dispatch order for this dispatcher in</span><br>    <span class="hljs-comment">// a multithreaded environment for a couple reasons:</span><br>    <span class="hljs-comment">//</span><br>    <span class="hljs-comment">// 1. Subscribers to events posted on different threads can be interleaved with each other</span><br>    <span class="hljs-comment">//    freely. (A event on one thread, B event on another could yield any of</span><br>    <span class="hljs-comment">//    [a1, a2, a3, b1, b2], [a1, b2, a2, a3, b2], [a1, b2, b3, a2, a3], etc.)</span><br>    <span class="hljs-comment">// 2. It&#x27;s possible for subscribers to actually be dispatched to in a different order than they</span><br>    <span class="hljs-comment">//    were added to the queue. It&#x27;s easily possible for one thread to take the head of the</span><br>    <span class="hljs-comment">//    queue, immediately followed by another thread taking the next element in the queue. That</span><br>    <span class="hljs-comment">//    second thread can then dispatch to the subscriber it took before the first thread does.</span><br>    <span class="hljs-comment">//</span><br>    <span class="hljs-comment">// All this makes me really wonder if there&#x27;s any value in queueing here at all. A dispatcher</span><br>    <span class="hljs-comment">// that simply loops through the subscribers and dispatches the event to each would actually</span><br>    <span class="hljs-comment">// probably provide a stronger order guarantee, though that order would obviously be different</span><br>    <span class="hljs-comment">// in some cases.</span><br><br>    <span class="hljs-comment">/** Global event queue. */</span><br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> ConcurrentLinkedQueue&lt;EventWithSubscriber&gt; queue =<br>        Queues.newConcurrentLinkedQueue();<br><br>    <span class="hljs-meta">@Override</span><br>    <span class="hljs-keyword">void</span> <span class="hljs-title function_">dispatch</span><span class="hljs-params">(Object event, Iterator&lt;Subscriber&gt; subscribers)</span> &#123;<br>      checkNotNull(event);<br>      <span class="hljs-keyword">while</span> (subscribers.hasNext()) &#123;<br>        queue.add(<span class="hljs-keyword">new</span> <span class="hljs-title class_">EventWithSubscriber</span>(event, subscribers.next()));<br>      &#125;<br><br>      EventWithSubscriber e;<br>      <span class="hljs-keyword">while</span> ((e = queue.poll()) != <span class="hljs-literal">null</span>) &#123;<br>        e.subscriber.dispatchEvent(e.event);<br>      &#125;<br>    &#125;<br><br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">EventWithSubscriber</span> &#123;<br>      <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> Object event;<br>      <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> Subscriber subscriber;<br><br>      <span class="hljs-keyword">private</span> <span class="hljs-title function_">EventWithSubscriber</span><span class="hljs-params">(Object event, Subscriber subscriber)</span> &#123;<br>        <span class="hljs-built_in">this</span>.event = event;<br>        <span class="hljs-built_in">this</span>.subscriber = subscriber;<br>      &#125;<br>    &#125;<br>  &#125;<br><br>  <span class="hljs-comment">/** Implementation of &#123;<span class="hljs-doctag">@link</span> #immediate()&#125;. */</span><br>  <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">ImmediateDispatcher</span> <span class="hljs-keyword">extends</span> <span class="hljs-title class_">Dispatcher</span> &#123;<br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-type">ImmediateDispatcher</span> <span class="hljs-variable">INSTANCE</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">ImmediateDispatcher</span>();<br><br>    <span class="hljs-meta">@Override</span><br>    <span class="hljs-keyword">void</span> <span class="hljs-title function_">dispatch</span><span class="hljs-params">(Object event, Iterator&lt;Subscriber&gt; subscribers)</span> &#123;<br>      checkNotNull(event);<br>      <span class="hljs-keyword">while</span> (subscribers.hasNext()) &#123;<br>        subscribers.next().dispatchEvent(event);<br>      &#125;<br>    &#125;<br>  &#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>好像结束的有点快, 核心类</p>
+<ol>
+<li><code>EventBus</code> 看上去没那么重要</li>
+<li><code>Subscriber</code></li>
+<li><code>Dispatcher</code></li>
+</ol>
+<p>从某些角度来看, 代码加起来不超过400行, 果然精华!!!<br>从某些角度来看这些代码的 <code>Style</code>, emmmm 其实看不惯!</p>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/EventBus/">EventBus</a>
+                    
+                      <a class="hover-with-bg" href="/tags/Guava/">Guava</a>
+                    
+                      <a class="hover-with-bg" href="/tags/Bus/">Bus</a>
+                    
+                      <a class="hover-with-bg" href="/tags/Event/">Event</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">
+                  
+                    本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
+                  
+                </p>
+              
+              
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2022/03/16/%E6%B5%8B%E8%AF%95%E9%A9%B1%E5%8A%A8%E5%BC%80%E5%8F%91%E6%A1%86%E6%9E%B6-Spock/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">测试驱动开发框架-Spock</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2022/03/15/SpringBoot-GraphQL/">
+                        <span class="hidden-mobile">SpringBoot-GraphQL</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <article class="comments" id="comments" lazyload>
+                
+                  
+                
+                
+  <div id="valine"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#valine', function() {
+      Fluid.utils.createScript('https://cdn.jsdelivr.net/npm/valine@1/dist/Valine.min.js', function() {
+        var options = Object.assign(
+          {"appId":"f4vcNmavU2FE0XpoDPBQPfXC-gzGzoHsz","appKey":"QfBICgcqjS6nFDOmHr3EClNz","path":"window.location.pathname","placeholder":"留言仅限讨论，禁止广告等行为","avatar":"retro","meta":["nick","mail","link"],"requiredFields":[],"pageSize":10,"lang":"zh-CN","highlight":true,"recordIP":true,"serverURLs":"https://f4vcnmav.lc-cn-n1-shared.com","emojiCDN":null,"emojiMaps":null,"enableQQ":true},
+          {
+            el: "#valine",
+            path: window.location.pathname
+          }
+        )
+        new Valine(options);
+        Fluid.utils.waitElementVisible('#valine .vcontent', () => {
+          Fluid.plugins.initFancyBox('#valine .vcontent img:not(.vemoji)');
+        })
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+              </article>
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+  <div class="col-lg-7 mx-auto nopadding-x-md">
+    <div class="container custom post-custom mx-auto">
+      <img src="https://octodex.github.com/images/jetpacktocat.png" srcset="/img/loading.gif" lazyload class="rounded mx-auto d-block mt-5" style="width:150px; height:150px;">
+    </div>
+  </div>
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> <div style="font-size: 0.85rem"> <span id="timeDate">载入天数...</span> <span id="times">载入时分秒...</span> <script src="/js/duration.js"></script> </div> 
+  </div>
+  
+  <div class="statistics">
+    
+    
+
+    
+      
+        <!-- 不蒜子统计PV -->
+        <span id="busuanzi_container_site_pv" style="display: none">
+            总访问量 
+            <span id="busuanzi_value_site_pv"></span>
+             次
+          </span>
+      
+      
+        <!-- 不蒜子统计UV -->
+        <span id="busuanzi_container_site_uv" style="display: none">
+            总访客数 
+            <span id="busuanzi_value_site_uv"></span>
+             人
+          </span>
+      
+    
+  </div>
+
+
+  
+
+  
+</footer>
+
+
+  <!-- SCRIPTS -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+  
+
+
+
+  
+    <script  src="https://cdn.jsdelivr.net/npm/tocbot@4/dist/tocbot.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4/anchor.min.js" ></script>
+  
+  
+    <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js" ></script>
+  
+
+
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+        typing(title);
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+    <!-- Baidu Analytics -->
+    <script defer>
+      var _hmt = _hmt || [];
+      (function () {
+        var hm = document.createElement("script");
+        hm.src = "https://hm.baidu.com/hm.js?3febe9df0ed325051aef878c004822e5";
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(hm, s);
+      })();
+    </script>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"jsonPath":"/live2dw/assets/koharu.model.json"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":true},"log":false});</script></body>
+</html>
